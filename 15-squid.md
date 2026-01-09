@@ -1,108 +1,203 @@
-# SQUID proxy
+# SQUID Proxy Server
+
+> Squid on võimas proxy ja vahemälu server, mis võimaldab kontrollida ja kiirendada veebiliiklust.
+
 [Tagasi README](README.md) · [← Eelmine](14-nfs.md) · [Järgmine →](16-iscsi.md)
 
-## Install
+---
+
+## Eeldused
+
+- Debian/Ubuntu server on seadistatud
+- Kasutajal on sudo õigused
+- Port 3128 on vaba
+
+---
+
+## Paigaldamine
+
 ```bash
 sudo apt update && sudo apt upgrade -y
 sudo apt install squid -y
 sudo systemctl enable --now squid
+```
+
+Varukoopia:
+```bash
 sudo cp /etc/squid/squid.conf{,.bak}
 ```
 
-## Põhiseadistus
+---
+
+## Põhikonfiguratsioon
+
 ```bash
 sudo nano /etc/squid/squid.conf
-# acl my_list src 10.0.80.0/24
-# http_access allow my_list
-# http_access deny plaas.lan
-# acl plaas.lan dstdomain "/etc/squid/soovimatud-saidid"
-# request_header_access Referer deny all
-# request_header_access X-Forwarded-For deny all
-# request_header_access Via deny all
-# request_header_access Cache-Control deny all
-# forwarded_for off
 ```
 
-Keelatud saidid:
+Näidisseaded:
+```text
+# ACL definitsioonid
+acl localnet src 10.0.80.0/24
+acl SSL_ports port 443
+acl Safe_ports port 80 443
+
+# Ligipääsu reeglid
+http_access allow localnet
+http_access deny all
+
+# Proxy port
+http_port 3128
+
+# Anonüümsus
+forwarded_for off
+request_header_access X-Forwarded-For deny all
+request_header_access Via deny all
+```
+
+---
+
+## Veebilehtede blokeerimine
+
+### Domeenide blokeerimine
+
 ```bash
-sudo nano /etc/squid/soovimatud-saidid
-# .youtube.com
-# .twitter.com
-# .redhat.com
+sudo nano /etc/squid/blocked-sites.txt
 ```
 
-Keelatud sõnad:
+Sisu:
+```text
+.youtube.com
+.twitter.com
+.facebook.com
+```
+
+Lisa `squid.conf` faili:
+```text
+acl blocked_sites dstdomain "/etc/squid/blocked-sites.txt"
+http_access deny blocked_sites
+```
+
+### Sõnade blokeerimine
+
 ```bash
-sudo nano /etc/squid/banned-words
-# gaming
-# porno
-# film
-# mp3
-# mp4
-# ja lisa squid.conf:
-# acl banned-words url_regex "/etc/squid/banned-words"
+sudo nano /etc/squid/blocked-words.txt
 ```
 
-Restart + firewall:
+Sisu:
+```text
+gaming
+gambling
+torrent
+```
+
+Lisa `squid.conf` faili:
+```text
+acl blocked_words url_regex -i "/etc/squid/blocked-words.txt"
+http_access deny blocked_words
+```
+
+Taaskäivitamine:
 ```bash
 sudo systemctl restart squid
+```
+
+---
+
+## Tulemüür
+
+```bash
 sudo ufw allow 3128/tcp
 ```
 
-Logid:
+---
+
+## Parooliga autentimine
+
+```bash
+sudo apt install apache2-utils -y
+sudo htpasswd -c /etc/squid/passwd kasutaja
+```
+
+Lisa `squid.conf` faili:
+```text
+auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
+auth_param basic realm Squid Proxy
+acl authenticated proxy_auth REQUIRED
+http_access allow authenticated
+```
+
+---
+
+## SARG (Squid Analysis Report Generator)
+
+```bash
+sudo apt install sarg -y
+sudo nano /etc/sarg/sarg.conf
+```
+
+Seaded:
+```text
+access_log /var/log/squid/access.log
+output_dir /var/www/html/sarg
+```
+
+Raporti genereerimine:
+```bash
+sudo sarg
+```
+
+---
+
+## Klientide seadistamine
+
+### Brauseris
+Seaded → Proxy → Manual → `server-ip:3128`
+
+### Süsteemitasandil (Linux)
+
+```bash
+sudo nano /etc/environment
+```
+
+```text
+http_proxy="http://server-ip:3128"
+https_proxy="http://server-ip:3128"
+```
+
+### APT proxy
+
+```bash
+sudo nano /etc/apt/apt.conf.d/proxy.conf
+```
+
+```text
+Acquire::http::Proxy "http://server-ip:3128";
+Acquire::https::Proxy "http://server-ip:3128";
+```
+
+---
+
+## Logide vaatamine
+
 ```bash
 sudo tail -f /var/log/squid/access.log
 ```
 
-## Parooliga kasutamine
-```bash
-sudo apt install apache2-utils -y
-sudo htpasswd -c /etc/squid/passwd <username>
-# squid.conf lisa:
-# auth_param basic program /usr/lib/squid/basic_ncsa_auth /etc/squid/passwd
-# auth_param basic children 5
-# auth_param basic realm Squid Basic Authentication
-# auth_param basic credentialsttl 2 hours
-# acl auth_users proxy_auth REQUIRED
-# http_access allow auth_users
-sudo systemctl restart squid
-```
-
-## SARG
-```bash
-sudo apt install sarg
-sudo nano /etc/sarg/sarg.conf
-# access_log /var/log/squid/access.log
-# ip_resolv on
-sudo sarg
-```
-
-## Klientide seadistused
-Firefox/Chrome: GUI kaudu käsitsi.
-APT/curl/wget/süsteem:
-```bash
-# /etc/apt/apt.conf
-Acquire::http::Proxy "http://<proxy_ip>:3128";
-Acquire::https::Proxy "https://<proxy_ip>:3128";
-# ~/.curlrc
-proxy = http://<proxy_ip>:3128
-https_proxy=http://<proxy_ip>:3128
-# ~/.wgetrc
-http_proxy=http://<proxy_ip>:3128
-https_proxy=http://<proxy_ip>:3128
-# /etc/profile.d/squid.sh
-export proxy_ip=192.168.200.56
-export http_proxy=http://$proxy_ip:3128
-export https_proxy=http://$proxy_ip:3128
-export ftp_proxy=http://$proxy_ip:3128
-export HTTP_PROXY=http://$proxy_ip:3128
-export HTTPS_PROXY=http://$proxy_ip:3128
-export FTP_PROXY=http://$proxy_ip:3128
-source /etc/profile.d/squid.sh
-```
+---
 
 ## Vigade leidmine ja parandamine
-- `ngrep -d any port 3128` aitab kontrollida liiklust
+
+| Probleem | Lahendus |
+|----------|----------|
+| ACL ei tööta | Kontrolli reeglite järjekorda |
+| Ligipääs keelatud | `http_access allow` peab olema enne `deny all` |
+| Klient ei ühendu | Kontrolli port 3128 tulemüüris |
+
+---
 
 ## Levinud vead
-- `http_access` reeglite järjekord vale
+
+- **http_access reeglite järjekord** – Squid töötleb reegleid järjekorras, esimene sobiv võidab
+- **Vale ACL süntaks** – kontrolli tühikuid ja jutumärke
+- **Proxy pole kliendis seadistatud** – iga rakendus vajab eraldi seadistust

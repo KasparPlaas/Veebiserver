@@ -1,43 +1,142 @@
-# Cacti
+# Cacti Võrgumonitoring
+
+> Cacti on SNMP-põhine võrgumonitooringu tööriist, mis loob ilusaid graafikuid võrguseadmete ja serverite jõudluse kohta.
+
 [Tagasi README](README.md) · [← Eelmine](18-zabbix.md) · [Järgmine →](20-nagios.md)
 
-## Repo + install
+---
+
+## Eeldused
+
+- Debian 12/13 server on seadistatud
+- Kasutajal on sudo õigused
+- LAMP stack (Apache, MySQL, PHP) on paigaldatud
+
+---
+
+## Paigaldamine
+
+### Repository seadistamine
+
 ```bash
 sudo nano /etc/apt/sources.list
-# deb http://deb.debian.org/debian/ trixie main non-free-firmware non-free
-# deb http://security.debian.org/debian-security trixie-security main non-free-firmware non-free
-# deb http://deb.debian.org/debian/ trixie-updates main non-free-firmware non-free
-# deb http://deb.debian.org/debian/ trixie-backports main non-free-firmware non-free
-
-sudo apt update
-sudo apt -y install cacti snmp snmpd snmp-mibs-downloader php-mysql php-snmp php-intl rrdtool
 ```
 
-## SNMPD
+Veendu, et on olemas:
+```text
+deb http://deb.debian.org/debian/ bookworm main contrib non-free non-free-firmware
+```
+
+### Pakettide paigaldamine
+
+```bash
+sudo apt update
+sudo apt install -y cacti snmp snmpd snmp-mibs-downloader php-mysql php-snmp php-intl rrdtool
+```
+
+Paigaldamise ajal:
+- Vali andmebaasi server: **apache2**
+- Seadista Cacti andmebaas: **Yes**
+- Sisesta parool
+
+---
+
+## SNMP seadistamine (server)
+
 ```bash
 sudo nano /etc/snmp/snmpd.conf
-# agentAddress udp:161
-# rocommunity public 10.0.80.0/24
-# sysLocation Serveriruum
-# sysContact admin@example.com
-sudo ufw allow 161 && sudo systemctl restart snmpd && sudo systemctl enable snmpd
 ```
-Test:
+
+Seaded:
+```text
+agentAddress udp:161
+rocommunity public 10.0.80.0/24
+sysLocation Serveriruum
+sysContact admin@plaas.lan
+```
+
 ```bash
+sudo systemctl restart snmpd
+sudo systemctl enable snmpd
+```
+
+### Tulemüür
+
+```bash
+sudo ufw allow 161/udp
+```
+
+### Testimine
+
+```bash
+snmpwalk -v2c -c public localhost
 snmpwalk -v2c -c public 10.0.80.2
 ```
 
-## Windows SNMP
+---
+
+## SNMP (Windows klient)
+
+### PowerShell
+
 ```powershell
 Add-WindowsCapability -Online -Name SNMP.Client~~~~0.0.1.0
 ```
-Seaded: Security → community `public` (RO), lubatud hostid → 10.0.80.2.
 
-## Cacti UI
-`https://<ip>/cacti` → `admin/Passw0rd`. Lisa seadmed: Debian (10.0.80.2), Windows (10.0.80.100).
+### Seadistamine
+
+1. **Services** → **SNMP Service** → **Properties**
+2. **Security** tab:
+   - Community: `public` (Read Only)
+   - Accept SNMP packets: lisa serveri IP
+3. Restart teenust
+
+---
+
+## Cacti veebiinterfeis
+
+Ava brauseris: `http://server-ip/cacti`
+
+Esmasel sisselogimisel:
+- **Username:** admin
+- **Password:** admin (vaheta kohe ära!)
+
+---
+
+## Seadmete lisamine
+
+1. **Console** → **Management** → **Devices** → **Add**
+2. Täida:
+   - **Description:** Serveri nimi
+   - **Hostname:** IP-aadress
+   - **SNMP Version:** Version 2
+   - **SNMP Community:** public
+3. **Create**
+4. **Create Graphs for this Host**
+
+---
+
+## Graafikute loomine
+
+1. **Console** → **Management** → **Devices**
+2. Vali seade → **Create Graphs**
+3. Märgi soovitud graafikud (CPU, Memory, Network)
+4. **Create**
+
+---
 
 ## Vigade leidmine ja parandamine
-- SNMP community/ACL vale
+
+| Probleem | Lahendus |
+|----------|----------|
+| SNMP ei vasta | Kontrolli community stringi ja ACL-i |
+| Graafikud tühjad | Oota 5-10 minutit andmete kogumiseks |
+| Permission denied | Kontrolli kausta õigusi |
+
+---
 
 ## Levinud vead
-- 161/tcp vs 161/udp segamini
+
+- **Community string vale** – peab kattuma serveril ja kliendil
+- **Port 161 UDP vs TCP** – SNMP kasutab UDP-d
+- **Andmeid pole** – poller peab töötama (kontrolli cron)

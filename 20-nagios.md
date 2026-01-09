@@ -1,48 +1,210 @@
-# Nagios
+# Nagios Monitooring
+
+> Nagios on võimas avatud lähtekoodiga monitooringusüsteem, mis jälgib servereid, teenuseid ja võrguseadmeid ning teavitab probleemidest.
+
 [Tagasi README](README.md) · [← Eelmine](19-cacti.md) · [Järgmine →](21-wazuh.md)
 
-## Install + CGI
-```bash
-sudo apt -y install nagios4
-sudo nano /etc/nagios4/cgi.cfg
-# use_authentication=1
-sudo nano /etc/apache2/conf-enabled/nagios4-cgi.conf
-# Require ip 10.0.80.0/24
-# AuthDigestDomain "Nagios4"
-# AuthUserFile "/etc/nagios4/htdigest.users"
-# Require valid-user
-sudo a2enmod cgid
-sudo systemctl restart nagios4 apache2
-htdigest /etc/nagios4/htdigest.users "Nagios4" nagiosadmin
-```
-UI: `http://<ip>/nagios4`.
+---
 
-## Hostide näited
-AlmaLinux:
+## Eeldused
+
+- Debian/Ubuntu server on seadistatud
+- Apache2 on paigaldatud
+- Kasutajal on sudo õigused
+
+---
+
+## Paigaldamine
+
+```bash
+sudo apt update
+sudo apt install -y nagios4 nagios-plugins nagios-nrpe-plugin
+```
+
+---
+
+## CGI seadistamine
+
+### Autentimise lubamine
+
+```bash
+sudo nano /etc/nagios4/cgi.cfg
+```
+
+Seadista:
+```text
+use_authentication=1
+```
+
+### Apache konfigureerimine
+
+```bash
+sudo nano /etc/apache2/conf-enabled/nagios4-cgi.conf
+```
+
+Lisa/muuda:
+```apache
+<Directory "/usr/lib/cgi-bin/nagios4">
+    Options ExecCGI
+    AllowOverride None
+    
+    AuthType Digest
+    AuthName "Nagios4"
+    AuthDigestDomain "/nagios4"
+    AuthUserFile "/etc/nagios4/htdigest.users"
+    Require valid-user
+</Directory>
+```
+
+### Kasutaja loomine
+
+```bash
+sudo htdigest -c /etc/nagios4/htdigest.users "Nagios4" nagiosadmin
+```
+
+### Mooduli lubamine
+
+```bash
+sudo a2enmod cgid auth_digest
+sudo systemctl restart nagios4 apache2
+```
+
+---
+
+## Veebiinterfeis
+
+Ava brauseris: `http://server-ip/nagios4`
+
+---
+
+## Hostide lisamine
+
+### Kausta loomine
+
+```bash
+sudo mkdir -p /etc/nagios4/servers
+```
+
+Lisa `nagios.cfg` faili:
+```bash
+sudo nano /etc/nagios4/nagios.cfg
+```
+
+```text
+cfg_dir=/etc/nagios4/servers
+```
+
+### Linux hosti näide (AlmaLinux)
+
 ```bash
 sudo nano /etc/nagios4/servers/alma.cfg
-# define host { use linux-server; host_name alma01; alias AlmaLinux Client; address 10.0.80.3 }
-# define service { use generic-service; host_name alma01; service_description PING; check_command check_ping!100.0,20%!500.0,60% }
-# define service { use generic-service; host_name alma01; service_description Disk Usage; check_command check_nrpe!check_disk }
-# define service { use generic-service; host_name alma01; service_description Load; check_command check_nrpe!check_load }
-```
-Windows:
-```bash
-sudo nano /etc/nagios4/servers/winklient.cfg
-# define host { use windows-server; host_name win01; alias Windows Client; address 192.168.1.30 }
-# define service { use generic-service; host_name win01; service_description PING; check_command check_ping!100.0,20%!500.0,60% }
-# define service { use generic-service; host_name win01; service_description CPU Load; check_command check_nt!CPULOAD!-l 5,80,90 }
-# define service { use generic-service; host_name win01; service_description Disk C; check_command check_nt!USEDDISKSPACE!-l c -w 80 -c 90 }
 ```
 
-Test + restart:
+```text
+define host {
+    use                     linux-server
+    host_name               alma01
+    alias                   AlmaLinux Server
+    address                 10.0.80.3
+    max_check_attempts      5
+    check_period            24x7
+    notification_interval   30
+    notification_period     24x7
+}
+
+define service {
+    use                     generic-service
+    host_name               alma01
+    service_description     PING
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+
+define service {
+    use                     generic-service
+    host_name               alma01
+    service_description     SSH
+    check_command           check_ssh
+}
+```
+
+### Windows hosti näide
+
+```bash
+sudo nano /etc/nagios4/servers/windows.cfg
+```
+
+```text
+define host {
+    use                     windows-server
+    host_name               win01
+    alias                   Windows Client
+    address                 10.0.80.100
+}
+
+define service {
+    use                     generic-service
+    host_name               win01
+    service_description     PING
+    check_command           check_ping!100.0,20%!500.0,60%
+}
+```
+
+---
+
+## Konfiguratsiooni kontrollimine
+
 ```bash
 sudo nagios4 -v /etc/nagios4/nagios.cfg
+```
+
+Kui vigu pole:
+```bash
 sudo systemctl restart nagios4
 ```
 
+---
+
+## NRPE Agent (kaugmonitoring)
+
+### Agendi paigaldamine (Debian kliendil)
+
+```bash
+sudo apt install -y nagios-nrpe-server nagios-plugins
+```
+
+```bash
+sudo nano /etc/nagios/nrpe.cfg
+```
+
+Seadista:
+```text
+allowed_hosts=127.0.0.1,nagios-server-ip
+```
+
+```bash
+sudo systemctl restart nagios-nrpe-server
+```
+
+### Tulemüür
+
+```bash
+sudo ufw allow 5666/tcp
+```
+
+---
+
 ## Vigade leidmine ja parandamine
-- `nagios4 -v` annab täpse vea
+
+| Probleem | Lahendus |
+|----------|----------|
+| Konfiviga | `nagios4 -v /etc/nagios4/nagios.cfg` |
+| Auth ei tööta | Kontrolli htdigest faili ja Apache moodulit |
+| Host punane | Kontrolli võrguühendust ja tulemüüri |
+
+---
 
 ## Levinud vead
-- Vale `check_command` parameetrid
+
+- **Vale check_command** – parameetrid peavad vastama plugin nõuetele
+- **cfg_dir puudu** – `/etc/nagios4/servers` peab olema lisatud
+- **Õigused valed** – konfifailid peavad olema loetavad nagios kasutajale

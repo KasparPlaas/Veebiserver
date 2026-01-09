@@ -1,33 +1,109 @@
-# SMTP (Postfix)
+# SMTP Server (Postfix)
+
+> Postfix on populaarne ja turvaline meiliserver. See juhend näitab põhiseadistust lokaalse meili jaoks.
+
 [Tagasi README](README.md) · [← Eelmine](08-nginx.md) · [Järgmine →](10-tftp.md)
 
-## DNS kirjed
+---
+
+## Eeldused
+
+- Debian/Ubuntu server on seadistatud
+- DNS on konfigureeritud (MX kirje)
+- Kasutajal on sudo õigused
+
+---
+
+## DNS kirjete lisamine
+
+Lisa DNS tsooni:
 ```text
-mail.plaas.lan. IN A 10.0.80.2
-plaas.lan. 3d IN MX 10 mail.plaas.lan.
+mail    IN      A       10.0.80.2
+@       IN      MX  10  mail.plaas.lan.
 ```
 
-## Install ja seadistus
+> **NB!** Ära unusta Serial numbrit tõsta.
+
+---
+
+## Paigaldamine
+
 ```bash
-sudo apt install postfix
-# vali "Internet Site"
-dpkg-reconfigure postfix
-# System mail name: mail.plaas.lan
-# Muud seaded vastavalt sinu sisule
+sudo apt update
+sudo apt install postfix -y
+```
+
+Installimisel vali:
+- **Internet Site** – meili saatmine ja vastuvõtmine otse
+
+---
+
+## Konfigureerimine
+
+```bash
+sudo dpkg-reconfigure postfix
+```
+
+Seaded:
+- **System mail name:** `mail.plaas.lan`
+- **Root and postmaster recipient:** (jäta tühjaks või sisesta kasutaja)
+- **Other destinations:** `plaas.lan, localhost`
+- **Local networks:** `127.0.0.0/8 [::ffff:127.0.0.0]/104 [::1]/128 10.0.80.0/24`
+
+```bash
 sudo systemctl reload postfix
-sudo apt install mailutils mutt
 ```
 
-## Kiirtest
+---
+
+## Meilitööriistade paigaldamine
+
 ```bash
-# kiri
-echo "Tere" | mail -s "Test" kasutaja@minu.lan
-# vaata
+sudo apt install mailutils mutt -y
+```
+
+---
+
+## Testimine
+
+Kirja saatmine:
+```bash
+echo "Tere! See on testmeil." | mail -s "Testteade" kasutaja@plaas.lan
+```
+
+Kirjade vaatamine:
+```bash
 mutt
 ```
 
+või
+```bash
+mail
+```
+
+---
+
+## Kontrollimine
+
+```bash
+systemctl status postfix
+sudo tail -f /var/log/mail.log
+```
+
+---
+
 ## Vigade leidmine ja parandamine
-- `mail.log` vaata: `tail -f /var/log/mail.log`
+
+| Probleem | Lahendus |
+|----------|----------|
+| Meil ei lähe | `tail -f /var/log/mail.log` |
+| MX puudu | Lisa DNS kirje ja tõsta Serial |
+| Relay keelatud | Kontrolli `mynetworks` seadet |
+
+---
 
 ## Levinud vead
-- MX puudu või vale
+
+- **MX kirje puudu või vale** – meili ei suunata õigesse serverisse
+- **Hostname ei vasta** – `myhostname` peab vastama DNS-ile
+- **Tulemüür blokeerib** – port 25 peab olema lubatud

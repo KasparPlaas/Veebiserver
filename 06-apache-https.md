@@ -1,71 +1,170 @@
-# Apache2 HTTPS + vhostid
+# Apache2 HTTPS + Virtual Hosts
+
+> Apache2 on üks populaarsemaid veebiservereid. See juhend näitab, kuidas seadistada HTTPS ja virtuaalhostid.
+
 [Tagasi README](README.md) · [← Eelmine](05-ufw.md) · [Järgmine →](07-almalinux-staatiline-ip.md)
 
-## Sertid
+---
+
+## Eeldused
+
+- Debian/Ubuntu server on seadistatud
+- DNS on konfigureeritud (domeenid lahenduvad)
+- Kasutajal on sudo õigused
+
+---
+
+## Apache2 paigaldamine
+
 ```bash
-sudo apt install apache2
-mkdir ~/ssl && cd ~/ssl
-openssl req -nodes -new -keyout www.plaas.lan.key -newkey rsa:2048 > www.plaas.lan.csr
-openssl x509 -req -days 3650 -in www.plaas.lan.csr -signkey www.plaas.lan.key -out www.plaas.lan.crt
-openssl req -nodes -new -keyout sales.plaas.lan.key -newkey rsa:2048 > sales.plaas.lan.csr
-openssl x509 -req -days 3650 -in sales.plaas.lan.csr -signkey sales.plaas.lan.key -out sales.plaas.lan.crt
-sudo mkdir /etc/apache2/ssl
-sudo cp ~/ssl/* /etc/apache2/ssl
+sudo apt update
+sudo apt install apache2 -y
+sudo systemctl enable --now apache2
 ```
 
-## Vhostid
+---
+
+## SSL sertifikaatide genereerimine
+
+### Sertifikaatide kaust
+
+```bash
+mkdir ~/ssl && cd ~/ssl
+sudo mkdir -p /etc/apache2/ssl
+```
+
+### Sertifikaatide loomine
+
+```bash
+# www.plaas.lan
+openssl req -nodes -new -keyout www.plaas.lan.key -newkey rsa:2048 -out www.plaas.lan.csr
+openssl x509 -req -days 3650 -in www.plaas.lan.csr -signkey www.plaas.lan.key -out www.plaas.lan.crt
+
+# sales.plaas.lan
+openssl req -nodes -new -keyout sales.plaas.lan.key -newkey rsa:2048 -out sales.plaas.lan.csr
+openssl x509 -req -days 3650 -in sales.plaas.lan.csr -signkey sales.plaas.lan.key -out sales.plaas.lan.crt
+
+# Kopeeri serdid Apache kausta
+sudo cp ~/ssl/* /etc/apache2/ssl/
+```
+
+---
+
+## Virtual Hostide seadistamine
+
+### Konfiguratsioonifailid
+
 ```bash
 sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/www-ssl.conf
 sudo cp /etc/apache2/sites-available/default-ssl.conf /etc/apache2/sites-available/sales-ssl.conf
+```
 
-# www-ssl.conf
-# ServerName www.plaas.lan
-# SSLCertificateFile /etc/apache2/ssl/www.plaas.lan.crt
-# SSLCertificateKeyFile /etc/apache2/ssl/www.plaas.lan.key
+### www-ssl.conf näidis
 
-# sales-ssl.conf
-# ServerName sales.plaas.lan
-# SSLCertificateFile /etc/apache2/ssl/sales.plaas.lan.crt
-# SSLCertificateKeyFile /etc/apache2/ssl/sales.plaas.lan.key
+```bash
+sudo nano /etc/apache2/sites-available/www-ssl.conf
+```
 
+```apache
+<VirtualHost *:443>
+    ServerName www.plaas.lan
+    DocumentRoot /var/www/www
+    
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/www.plaas.lan.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/www.plaas.lan.key
+</VirtualHost>
+```
+
+### sales-ssl.conf näidis
+
+```bash
+sudo nano /etc/apache2/sites-available/sales-ssl.conf
+```
+
+```apache
+<VirtualHost *:443>
+    ServerName sales.plaas.lan
+    DocumentRoot /var/www/sales
+    
+    SSLEngine on
+    SSLCertificateFile /etc/apache2/ssl/sales.plaas.lan.crt
+    SSLCertificateKeyFile /etc/apache2/ssl/sales.plaas.lan.key
+</VirtualHost>
+```
+
+---
+
+## Saitide aktiveerimine
+
+```bash
 sudo a2enmod ssl
 sudo a2ensite www-ssl
 sudo a2ensite sales-ssl
 sudo systemctl reload apache2
 ```
 
-## DNS A kirjed
-```bash
-# tõsta serial
-# lisa:
-# www.plaas.lan. IN A 10.0.80.2
-# sales.plaas.lan. IN A 10.0.80.2
-sudo systemctl restart bind9
-```
+---
 
 ## Dokumendikaustad
+
 ```bash
 sudo mkdir -p /var/www/www /var/www/sales
-printf '<h1>www</h1>' | sudo tee /var/www/www/index.html
-printf '<h1>sales</h1>' | sudo tee /var/www/sales/index.html
+echo '<h1>www.plaas.lan</h1>' | sudo tee /var/www/www/index.html
+echo '<h1>sales.plaas.lan</h1>' | sudo tee /var/www/sales/index.html
+```
+
+---
+
+## DNS A-kirjed
+
+Lisa DNS serverisse:
+```text
+www     IN      A       10.0.80.2
+sales   IN      A       10.0.80.2
+```
+
+> **NB!** Ära unusta Serial numbrit tõsta ja BIND9 restartida.
+
+---
+
+## HTTP → HTTPS suunamine
+
+```bash
+sudo nano /etc/apache2/sites-available/redirect.conf
+```
+
+```apache
+<VirtualHost *:80>
+    ServerName www.plaas.lan
+    Redirect permanent / https://www.plaas.lan/
+</VirtualHost>
+
+<VirtualHost *:80>
+    ServerName sales.plaas.lan
+    Redirect permanent / https://sales.plaas.lan/
+</VirtualHost>
+```
+
+```bash
+sudo a2ensite redirect
 sudo systemctl reload apache2
 ```
 
-## HTTPS suunamised (:80 → :443)
-```apache
-<VirtualHost *:80>
-  ServerName sales.plaas.lan
-  Redirect / https://sales.plaas.lan/
-</VirtualHost>
-<VirtualHost *:80>
-  ServerName www.plaas.lan
-  Redirect / https://www.plaas.lan/
-</VirtualHost>
-```
+---
 
 ## Vigade leidmine ja parandamine
-- Sertide teed: kontrolli `SSLCertificateFile/KeyFile`
-- Vhostide enabled: `a2ensite` + `systemctl reload apache2`
+
+| Probleem | Lahendus |
+|----------|----------|
+| Sert ei tööta | Kontrolli `SSLCertificateFile` ja `KeyFile` teid |
+| Sait ei ilmu | `a2ensite` ja `systemctl reload apache2` |
+| DNS ei lahenda | Tõsta Serial ja tee `systemctl restart bind9` |
+
+---
 
 ## Levinud vead
-- DNS serial unustatakse tõsta
+
+- **DNS Serial muutmata** – muudatused ei rakendu
+- **Sertifikaadi tee vale** – kontrolli failide asukohta
+- **Moodul lubamata** – `a2enmod ssl` unustatud

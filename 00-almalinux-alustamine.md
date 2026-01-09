@@ -1,22 +1,54 @@
-# AlmaLinux alustamine
-[Tagasi README](README.md) · [← Eelmine](00-debian-alustamine.md) · [Järgmine →](00-ubuntu-alustamine.md)
+# AlmaLinux Basic Configuration
 
-## Hostname
+> AlmaLinux on RHEL-põhine ettevõtteklass Linux distributsioon. See juhend aitab seadistada baaskonfiguratsiooni serveri jaoks.
+
+[Tagasi README](README.md) · [Järgmine →](01-debian-alustamine.md)
+
+---
+
+## Eeldused
+
+- AlmaLinux 9.x on paigaldatud
+- Kasutajal on sudo õigused
+- Võrguühendus on olemas (kas DHCP või ajutine)
+
+---
+
+## Hostname seadistamine
+
+Hostname määrab masina identiteedi võrgus.
+
 ```bash
 sudo hostnamectl set-hostname srv
 sudo nano /etc/hosts
-# lisa 127.0.1.1 srv
 ```
 
-## Staatiline IP
+Lisa või muuda rida:
+```text
+127.0.1.1   srv
+```
+
+---
+
+## Staatiline IP-aadress
+
+### Variant 1: nmtui (graafiline)
+
 ```bash
 sudo nmtui
 ```
-- Edit a connection → vali liides
-- IPv4: Manual → lisa IP, gateway, DNS
-- OK → Back → Activate a connection → deactivate/activate
 
-Või käsurealt:
+Tegevused:
+1. **Edit a connection** → vali võrguliides (nt `ens18`)
+2. **IPv4 CONFIGURATION** → muuda `<Automatic>` → `<Manual>`
+3. Lisa **Addresses** (nt `10.0.80.3/24`)
+4. Lisa **Gateway** (nt `10.0.80.1`)
+5. Lisa **DNS servers** (nt `8.8.8.8`)
+6. Salvesta ja välju
+7. **Activate a connection** → deaktiveeri ja aktiveeri uuesti
+
+### Variant 2: nmcli (käsurida)
+
 ```bash
 sudo nmcli con mod ens18 ipv4.addresses 10.0.80.3/24
 sudo nmcli con mod ens18 ipv4.gateway 10.0.80.1
@@ -25,25 +57,47 @@ sudo nmcli con mod ens18 ipv4.method manual
 sudo nmcli con up ens18
 ```
 
-## OpenSSH
+---
+
+## OpenSSH serveri paigaldamine
+
+SSH võimaldab turvalist kaugühendust serverisse.
+
 ```bash
 sudo dnf install openssh-server -y
 sudo systemctl enable --now sshd
+```
+
+Firewall reeglite lisamine:
+```bash
 sudo firewall-cmd --permanent --add-service=ssh
 sudo firewall-cmd --reload
 ```
 
-## Kontroll
+---
+
+## Kontrollimine
+
 ```bash
-hostnamectl
-ip a
-systemctl status sshd
+hostnamectl                  # hostname kontroll
+ip a                         # IP-aadressi kontroll
+systemctl status sshd        # SSH teenuse staatus
 ```
 
+---
+
 ## Vigade leidmine ja parandamine
-- Võrk ei tule: `nmcli con show` ja kontrolli seadeid
-- SSH ei tööta: `firewall-cmd --list-services`
+
+| Probleem | Lahendus |
+|----------|----------|
+| Võrk ei tule üles | `nmcli con show` ja kontrolli seadeid |
+| SSH ei tööta | `firewall-cmd --list-services` |
+| Ühendus katkeb | Kontrolli gateway ja DNS seadeid |
+
+---
 
 ## Levinud vead
-- Unustatud firewalld reeglid
-- `nmtui` muudatusi ei aktiveerita
+
+- **Firewalld reeglid lisamata** – SSH port 22 peab olema lubatud
+- **nmtui muudatusi ei aktiveerita** – peale salvestamist aktiveeri ühendus uuesti
+- **Vale liidese nimi** – kontrolli `ip link` käsuga õiget nime

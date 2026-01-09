@@ -1,33 +1,96 @@
-# DHCP (isc-dhcp-server)
+# DHCP Server (isc-dhcp-server)
+
+> DHCP server jagab automaatselt IP-aadresse võrgus olevatele seadmetele. See lihtsustab võrgu haldamist oluliselt.
+
 [Tagasi README](README.md) · [← Eelmine](03-bind9.md) · [Järgmine →](05-ufw.md)
 
-## Install + seadistus
+---
+
+## Eeldused
+
+- Debian/Ubuntu server on seadistatud
+- Serveril on staatiline IP-aadress
+- Kasutajal on sudo õigused
+
+---
+
+## Paigaldamine
+
 ```bash
-sudo apt install isc-dhcp-server
-sudo nano /etc/default/isc-dhcp-server
-# INTERFACES="ens18"
-
-sudo nano /etc/dhcp/dhcpd.conf
-# subnet 10.0.80.0 netmask 255.255.255.0 {
-#   range 10.0.80.100 10.0.80.200;
-#   option domain-name-servers 8.8.8.8;
-#   option domain-name "plaas.lan";
-#   option routers 10.0.80.1;
-#   option broadcast-address 10.0.80.255;
-#   default-lease-time 600;
-#   max-lease-time 7200;
-# }
-
-sudo systemctl start isc-dhcp-server
+sudo apt update
+sudo apt install isc-dhcp-server -y
 ```
 
-## Kontroll
+---
+
+## Võrguliidese määramine
+
+```bash
+sudo nano /etc/default/isc-dhcp-server
+```
+
+Määra liides, millel DHCP kuulab:
+```text
+INTERFACESv4="ens18"
+```
+
+---
+
+## Põhikonfiguratsioon
+
+```bash
+sudo nano /etc/dhcp/dhcpd.conf
+```
+
+Näidiskonfiguratsioon:
+```text
+# Globaalsed seaded
+default-lease-time 600;
+max-lease-time 7200;
+authoritative;
+
+# Alamvõrgu definitsioon
+subnet 10.0.80.0 netmask 255.255.255.0 {
+    range 10.0.80.100 10.0.80.200;
+    option domain-name-servers 8.8.8.8;
+    option domain-name "plaas.lan";
+    option routers 10.0.80.1;
+    option broadcast-address 10.0.80.255;
+}
+```
+
+---
+
+## Teenuse käivitamine
+
+```bash
+sudo systemctl start isc-dhcp-server
+sudo systemctl enable isc-dhcp-server
+```
+
+---
+
+## Kontrollimine
+
 ```bash
 sudo systemctl status isc-dhcp-server
-``` 
+cat /var/lib/dhcp/dhcpd.leases    # vaata väljastatud IP-sid
+```
+
+---
 
 ## Vigade leidmine ja parandamine
-- Liides vale: kontrolli `INTERFACES` väärtust
+
+| Probleem | Lahendus |
+|----------|----------|
+| Teenus ei käivitu | Kontrolli `INTERFACES` väärtust |
+| Klient ei saa IP-d | Kontrolli alamvõrgu seadeid |
+| Logide vaatamine | `journalctl -u isc-dhcp-server` |
+
+---
 
 ## Levinud vead
-- Kommentaarid (#) jäetud valesse kohta
+
+- **Vale liides** – `INTERFACES` peab vastama tegelikule võrguliidesele
+- **Kommentaarid vales kohas** – konfiguratsioonifaili süntaks peab olema õige
+- **Alamvõrk ei vasta serverile** – serveri IP peab olema samas alamvõrgus
