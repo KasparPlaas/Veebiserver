@@ -15,6 +15,22 @@
 - Vähemalt 4GB RAM (soovitatav 8GB)
 - Vähemalt 50GB kettaruumi
 - Kasutajal on sudo õigused
+- Serveri hostname peab olema seadistatud
+
+---
+
+## Ettevalmistus
+
+```bash
+# Uuenda süsteemi
+sudo apt update && sudo apt upgrade -y
+
+# Paigalda vajalikud paketid
+sudo apt install curl apt-transport-https gnupg2 -y
+
+# Kontrolli hostname (peab olema seadistatud!)
+hostnamectl
+```
 
 ---
 
@@ -22,12 +38,60 @@
 
 See paigaldab kõik komponendid ühele serverile: Wazuh manager, Wazuh indexer ja Wazuh dashboard.
 
+### Meetod 1: Automaatne paigaldus (lihtne)
+
 ```bash
-curl -sO https://packages.wazuh.com/4.x/wazuh-install.sh
-sudo bash wazuh-install.sh -a
+curl -sO https://packages.wazuh.com/4.10/wazuh-install.sh
+curl -sO https://packages.wazuh.com/4.10/config.yml
 ```
 
-> **NB!** Paigaldamine võib võtta 10-15 minutit. Jäta meelde paigalduse lõpus kuvatav admin parool!
+Muuda `config.yml` faili (asenda IP-aadressid oma serveri IP-ga):
+```bash
+nano config.yml
+```
+
+```yaml
+nodes:
+  indexer:
+    - name: wazuh-indexer
+      ip: "10.0.80.10"
+  server:
+    - name: wazuh-server
+      ip: "10.0.80.10"
+  dashboard:
+    - name: wazuh-dashboard
+      ip: "10.0.80.10"
+```
+
+Käivita paigaldus:
+```bash
+sudo bash wazuh-install.sh -a -i
+```
+
+> **NB!** `-i` ignoreerib tervisekontrolli hoiatusi. Paigaldamine võib võtta 15-20 minutit.
+
+### Meetod 2: Sammhaaval paigaldus
+
+Kui automaatne ei tööta:
+
+```bash
+# 1. Genereeri konfiguratsioon
+sudo bash wazuh-install.sh --generate-config-files
+
+# 2. Paigalda Wazuh indexer
+sudo bash wazuh-install.sh --wazuh-indexer wazuh-indexer
+
+# 3. Käivita klaster
+sudo bash wazuh-install.sh --start-cluster
+
+# 4. Paigalda Wazuh server
+sudo bash wazuh-install.sh --wazuh-server wazuh-server
+
+# 5. Paigalda Dashboard
+sudo bash wazuh-install.sh --wazuh-dashboard wazuh-dashboard
+```
+
+> **NB!** Jäta meelde paigalduse lõpus kuvatav admin parool!
 
 ---
 
@@ -211,6 +275,61 @@ sudo tail -f /var/ossec/logs/ossec.log
 | Dashboard ei avane | Kontrolli `wazuh-dashboard` teenust ja port 443 |
 | Agent ei ühendu | Kontrolli `<address>` ja pordid 1514/1515 |
 | Indexer kollane | `journalctl -u wazuh-indexer` |
+| Paigaldus ebaõnnestub | Kasuta `-i` lippu: `bash wazuh-install.sh -a -i` |
+| Mälu viga | Suurenda swap: `sudo fallocate -l 4G /swapfile` |
+| SSL viga | Kontrolli sertifikaate: `/etc/wazuh-indexer/certs/` |
+
+---
+
+## Paigalduse probleemide lahendamine
+
+### Kui paigaldus katkeb
+
+```bash
+# Eemalda poolik paigaldus
+sudo bash wazuh-install.sh --uninstall
+
+# Puhasta
+sudo apt remove --purge wazuh-* -y
+sudo rm -rf /var/ossec /etc/wazuh-* /var/lib/wazuh-*
+sudo rm -f wazuh-install-files.tar wazuh-install.sh config.yml
+
+# Alusta uuesti
+curl -sO https://packages.wazuh.com/4.10/wazuh-install.sh
+sudo bash wazuh-install.sh -a -i
+```
+
+### Indexer ei käivitu (mälu probleem)
+
+```bash
+# Lisa swap
+sudo fallocate -l 4G /swapfile
+sudo chmod 600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
+
+# Lisa fstab-i püsivaks
+echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+
+# Taaskäivita indexer
+sudo systemctl restart wazuh-indexer
+```
+
+### Logide kontrollimine
+
+```bash
+# Paigalduse logi
+sudo cat /var/log/wazuh-install.log
+
+# Indexer logi
+sudo journalctl -u wazuh-indexer -f
+
+# Manager logi
+sudo tail -f /var/ossec/logs/ossec.log
+
+# Dashboard logi
+sudo journalctl -u wazuh-dashboard -f
+```
 
 ---
 
@@ -219,3 +338,5 @@ sudo tail -f /var/ossec/logs/ossec.log
 - **Vale `<address>`** – agendi `ossec.conf` failis peab olema serveri IP
 - **Tulemüür** – pordid 1514/TCP ja 1515/TCP peavad olema avatud
 - **Vähe mälu** – Wazuh indexer vajab vähemalt 2GB vaba RAM-i
+- **Hostname puudu** – sea hostname enne paigaldust: `sudo hostnamectl set-hostname wazuh-server`
+- **config.yml vale** – kontrolli, et IP-aadressid on õiged

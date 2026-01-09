@@ -94,30 +94,3 @@ Alusta siit! Need juhendid aitavad seadistada serveri algseaded.
   <a href="19-zabbix.md"><img src="https://img.shields.io/badge/Zabbix-D50000?style=for-the-badge" alt="Zabbix"></a>
   <a href="22-wazuh.md"><img src="https://img.shields.io/badge/Wazuh-3CBCE8?style=for-the-badge" alt="Wazuh"></a>
 </p>
-
----
-
-### Iga juhend sisaldab
-
-<table>
-  <tr>
-    <td><b>Eeldused</b></td>
-    <td>Vajalikud tingimused ja nõuded</td>
-  </tr>
-  <tr>
-    <td><b>Paigaldus</b></td>
-    <td>Samm-sammult juhised</td>
-  </tr>
-  <tr>
-    <td><b>Konfiguratsioon</b></td>
-    <td>Näidisfailid ja seaded</td>
-  </tr>
-  <tr>
-    <td><b>Veaotsing</b></td>
-    <td>Tabelid probleemide lahendamiseks</td>
-  </tr>
-  <tr>
-    <td><b>Levinud vead</b></td>
-    <td>Tüüpilised vead ja nende vältimine</td>
-  </tr>
-</table>
