@@ -2,7 +2,11 @@
 
 > Cacti on SNMP-põhine võrgumonitooringu tööriist, mis loob ilusaid graafikuid võrguseadmete ja serverite jõudluse kohta.
 
-[Tagasi README](README.md) · [← Eelmine](18-zabbix.md) · [Järgmine →](20-nagios.md)
+<p align="center">
+  <a href="19-zabbix.md"><img src="https://img.shields.io/badge/Eelmine-Zabbix-D50000?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="21-nagios.md"><img src="https://img.shields.io/badge/Järgmine-Nagios-000000?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

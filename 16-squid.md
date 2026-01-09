@@ -2,7 +2,11 @@
 
 > Squid on võimas proxy ja vahemälu server, mis võimaldab kontrollida ja kiirendada veebiliiklust.
 
-[Tagasi README](README.md) · [← Eelmine](14-nfs.md) · [Järgmine →](16-iscsi.md)
+<p align="center">
+  <a href="15-nfs.md"><img src="https://img.shields.io/badge/Eelmine-NFS-6DB33F?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="17-iscsi.md"><img src="https://img.shields.io/badge/Järgmine-iSCSI-795548?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

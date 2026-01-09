@@ -2,7 +2,11 @@
 
 > iSCSI võimaldab pakkuda blokkseadmeid üle võrgu, mis tunduvad klientidele nagu lokaalsed kettad. Seda kasutatakse SAN (Storage Area Network) lahendustes.
 
-[Tagasi README](README.md) · [← Eelmine](15-squid.md) · [Järgmine →](17-ntp.md)
+<p align="center">
+  <a href="16-squid.md"><img src="https://img.shields.io/badge/Eelmine-SQUID_Proxy-EC407A?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="18-ntp.md"><img src="https://img.shields.io/badge/Järgmine-NTP-00BCD4?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

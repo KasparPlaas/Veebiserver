@@ -2,7 +2,10 @@
 
 > Wazuh on avatud lähtekoodiga turvaplatvorm, mis pakub ohutuvasust, logide analüüsi, failide terviklikkuse jälgimist ja haavatavuse skaneerimist.
 
-[Tagasi README](README.md) · [← Eelmine](20-nagios.md)
+<p align="center">
+  <a href="21-nagios.md"><img src="https://img.shields.io/badge/Eelmine-Nagios-000000?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+</p>
 
 ---
 
@@ -110,6 +113,68 @@ sudo dnf install wazuh-agent -y
 ```
 
 Konfigureeri ja käivita nagu Debianil.
+
+---
+
+### Windows klient
+
+**1. Laadi alla agent:**
+
+Ava PowerShell administraatorina:
+```powershell
+Invoke-WebRequest -Uri https://packages.wazuh.com/4.x/windows/wazuh-agent-4.9.2-1.msi -OutFile wazuh-agent.msi
+```
+
+Või laadi alla brauseris: https://packages.wazuh.com/4.x/windows/wazuh-agent-4.9.2-1.msi
+
+**2. Paigalda agent (GUI):**
+
+- Käivita allalaaditud `.msi` fail
+- Sisesta Wazuh Manager IP-aadress
+- Sisesta agendi nimi (nt `DESKTOP-WIN10`)
+- Lõpeta paigaldus
+
+**3. Paigalda agent (käsureal):**
+
+```powershell
+msiexec.exe /i wazuh-agent.msi /q WAZUH_MANAGER="10.0.80.10" WAZUH_AGENT_NAME="DESKTOP-WIN10" WAZUH_REGISTRATION_SERVER="10.0.80.10"
+```
+
+**4. Käivita teenus:**
+
+```powershell
+NET START WazuhSvc
+```
+
+**5. Kontrolli teenuse staatust:**
+
+```powershell
+Get-Service -Name WazuhSvc
+```
+
+**6. Agendi konfiguratsiooni muutmine:**
+
+Konfiguratsiooni fail asub: `C:\Program Files (x86)\ossec-agent\ossec.conf`
+
+```xml
+<server>
+  <address>WAZUH_MANAGER_IP</address>
+  <port>1514</port>
+  <protocol>tcp</protocol>
+</server>
+```
+
+**7. Teenuse taaskäivitamine:**
+
+```powershell
+Restart-Service -Name WazuhSvc
+```
+
+**8. Logide asukoht:**
+
+```
+C:\Program Files (x86)\ossec-agent\ossec.log
+```
 
 ---
 

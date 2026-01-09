@@ -2,7 +2,11 @@
 
 > Zabbix on ettevõtte tasemel monitooringulahendus, mis võimaldab jälgida servereid, võrguseadmeid ja rakendusi reaalajas.
 
-[Tagasi README](README.md) · [← Eelmine](17-ntp.md) · [Järgmine →](19-cacti.md)
+<p align="center">
+  <a href="18-ntp.md"><img src="https://img.shields.io/badge/Eelmine-NTP-00BCD4?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="20-cacti.md"><img src="https://img.shields.io/badge/Järgmine-Cacti-689F38?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

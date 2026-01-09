@@ -2,7 +2,11 @@
 
 > Postfix on populaarne ja turvaline meiliserver. See juhend näitab põhiseadistust lokaalse meili jaoks.
 
-[Tagasi README](README.md) · [← Eelmine](08-nginx.md) · [Järgmine →](10-tftp.md)
+<p align="center">
+  <a href="08-nginx.md"><img src="https://img.shields.io/badge/Eelmine-NGINX-009639?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="10-tftp.md"><img src="https://img.shields.io/badge/Järgmine-TFTP-607D8B?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

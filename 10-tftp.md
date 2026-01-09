@@ -2,7 +2,11 @@
 
 > TFTP on lihtne failiedastusprotokoll, mida kasutatakse peamiselt võrguseadmete alglaadimiseks (PXE boot) ja konfiguratsioonifailide jagamiseks.
 
-[Tagasi README](README.md) · [← Eelmine](09-smtp-postfix.md) · [Järgmine →](11-ftp-vsftpd.md)
+<p align="center">
+  <a href="09-smtp-postfix.md"><img src="https://img.shields.io/badge/Eelmine-Postfix_SMTP-005FF9?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="11-ftp-vsftpd.md"><img src="https://img.shields.io/badge/Järgmine-FTP-FF6F00?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

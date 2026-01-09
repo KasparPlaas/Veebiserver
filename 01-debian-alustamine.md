@@ -2,7 +2,11 @@
 
 > Debian on stabiilne ja usaldusväärne Linux distributsioon, mida kasutatakse laialdaselt serverites. See juhend aitab seadistada baaskonfiguratsiooni.
 
-[Tagasi README](README.md) · [← Eelmine](00-almalinux-alustamine.md) · [Järgmine →](02-ubuntu-alustamine.md)
+<p align="center">
+  <a href="00-almalinux-alustamine.md"><img src="https://img.shields.io/badge/Eelmine-AlmaLinux-EE0000?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="02-ubuntu-alustamine.md"><img src="https://img.shields.io/badge/Järgmine-Ubuntu_Basic_Config-E95420?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

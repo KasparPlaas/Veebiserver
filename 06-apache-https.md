@@ -2,7 +2,11 @@
 
 > Apache2 on üks populaarsemaid veebiservereid. See juhend näitab, kuidas seadistada HTTPS ja virtuaalhostid.
 
-[Tagasi README](README.md) · [← Eelmine](05-ufw.md) · [Järgmine →](07-almalinux-staatiline-ip.md)
+<p align="center">
+  <a href="05-ufw.md"><img src="https://img.shields.io/badge/Eelmine-UFW-DD4814?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="07-almalinux-staatiline-ip.md"><img src="https://img.shields.io/badge/Järgmine-AlmaLinux_NGINX-EE0000?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

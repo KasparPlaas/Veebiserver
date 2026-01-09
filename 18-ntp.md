@@ -2,7 +2,11 @@
 
 > NTP (Network Time Protocol) tagab, et kõik võrgus olevad seadmed näitavad õiget aega. See on oluline logide, sertifikaatide ja autentimise jaoks.
 
-[Tagasi README](README.md) · [← Eelmine](16-iscsi.md) · [Järgmine →](18-zabbix.md)
+<p align="center">
+  <a href="17-iscsi.md"><img src="https://img.shields.io/badge/Eelmine-iSCSI-795548?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="19-zabbix.md"><img src="https://img.shields.io/badge/Järgmine-Zabbix-D50000?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

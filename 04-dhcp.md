@@ -2,7 +2,11 @@
 
 > DHCP server jagab automaatselt IP-aadresse võrgus olevatele seadmetele. See lihtsustab võrgu haldamist oluliselt.
 
-[Tagasi README](README.md) · [← Eelmine](03-bind9.md) · [Järgmine →](05-ufw.md)
+<p align="center">
+  <a href="03-bind9.md"><img src="https://img.shields.io/badge/Eelmine-Bind9_DNS-4285F4?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="05-ufw.md"><img src="https://img.shields.io/badge/Järgmine-UFW-DD4814?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

@@ -2,7 +2,11 @@
 
 > NFS (Network File System) võimaldab jagada kaustasid Unix/Linux süsteemide vahel läbipaistvalt, nagu oleksid need lokaalsed.
 
-[Tagasi README](README.md) · [← Eelmine](13-samba.md) · [Järgmine →](15-squid.md)
+<p align="center">
+  <a href="14-load-balancer.md"><img src="https://img.shields.io/badge/Eelmine-Load_Balancer-FF6B6B?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="16-squid.md"><img src="https://img.shields.io/badge/Järgmine-SQUID_Proxy-EC407A?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

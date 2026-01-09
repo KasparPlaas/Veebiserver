@@ -2,7 +2,11 @@
 
 > UFW (Uncomplicated Firewall) on kasutajasõbralik tulemüür Linuxile. See võimaldab lihtsalt hallata võrgureegleid.
 
-[Tagasi README](README.md) · [← Eelmine](04-dhcp.md) · [Järgmine →](06-apache-https.md)
+<p align="center">
+  <a href="04-dhcp.md"><img src="https://img.shields.io/badge/Eelmine-DHCP-00979D?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="06-apache-https.md"><img src="https://img.shields.io/badge/Järgmine-Apache_HTTPS-D22128?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

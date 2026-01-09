@@ -2,7 +2,11 @@
 
 > See juhend näitab, kuidas seadistada AlmaLinuxil staatilist IP-d, firewalld tulemüüri ja NGINX veebiserverit.
 
-[Tagasi README](README.md) · [← Eelmine](06-apache-https.md) · [Järgmine →](08-nginx.md)
+<p align="center">
+  <a href="06-apache-https.md"><img src="https://img.shields.io/badge/Eelmine-Apache_HTTPS-D22128?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="08-nginx.md"><img src="https://img.shields.io/badge/Järgmine-NGINX-009639?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

@@ -2,7 +2,11 @@
 
 > NGINX on kiire ja efektiivne veebiserver ning reverse proxy. See juhend näitab virtual hostide seadistamist.
 
-[Tagasi README](README.md) · [← Eelmine](07-almalinux-staatiline-ip.md) · [Järgmine →](09-smtp-postfix.md)
+<p align="center">
+  <a href="07-almalinux-staatiline-ip.md"><img src="https://img.shields.io/badge/Eelmine-AlmaLinux_NGINX-EE0000?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="09-smtp-postfix.md"><img src="https://img.shields.io/badge/Järgmine-Postfix_SMTP-005FF9?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

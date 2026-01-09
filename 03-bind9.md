@@ -2,7 +2,11 @@
 
 > BIND9 on kõige laialdasemalt kasutatav DNS server tarkvara. See juhend näitab, kuidas seadistada oma DNS serverit.
 
-[Tagasi README](README.md) · [← Eelmine](02-ubuntu-alustamine.md) · [Järgmine →](04-dhcp.md)
+<p align="center">
+  <a href="02-ubuntu-alustamine.md"><img src="https://img.shields.io/badge/Eelmine-Ubuntu-E95420?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="04-dhcp.md"><img src="https://img.shields.io/badge/Järgmine-DHCP-00979D?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

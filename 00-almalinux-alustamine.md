@@ -2,7 +2,10 @@
 
 > AlmaLinux on RHEL-põhine ettevõtteklass Linux distributsioon. See juhend aitab seadistada baaskonfiguratsiooni serveri jaoks.
 
-[Tagasi README](README.md) · [Järgmine →](01-debian-alustamine.md)
+<p align="center">
+  <a href="README.md"><img src="https://img.shields.io/badge/Tagasi-README-blue?style=for-the-badge" alt="Tagasi"></a>
+  <a href="01-debian-alustamine.md"><img src="https://img.shields.io/badge/Järgmine-Debian_Basic_Config-A81D33?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

@@ -2,7 +2,11 @@
 
 > SAMBA võimaldab jagada faile ja kaustasid Linuxi ja Windowsi masinate vahel, kasutades SMB/CIFS protokolli.
 
-[Tagasi README](README.md) · [← Eelmine](12-sftp.md) · [Järgmine →](14-nfs.md)
+<p align="center">
+  <a href="12-sftp.md"><img src="https://img.shields.io/badge/Eelmine-SFTP-231F20?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="14-load-balancer.md"><img src="https://img.shields.io/badge/Järgmine-Load_Balancer-FF6B6B?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 

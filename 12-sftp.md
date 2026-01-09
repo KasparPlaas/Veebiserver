@@ -2,7 +2,11 @@
 
 > SFTP (SSH File Transfer Protocol) on turvaline failiedastusprotokoll, mis kasutab SSH krüpteeringut. See on turvalisem alternatiiv tavalisele FTP-le.
 
-[Tagasi README](README.md) · [← Eelmine](11-ftp-vsftpd.md) · [Järgmine →](13-samba.md)
+<p align="center">
+  <a href="11-ftp-vsftpd.md"><img src="https://img.shields.io/badge/Eelmine-FTP-FF6F00?style=for-the-badge" alt="Eelmine"></a>
+  <a href="README.md"><img src="https://img.shields.io/badge/README-blue?style=for-the-badge" alt="README"></a>
+  <a href="13-samba.md"><img src="https://img.shields.io/badge/Järgmine-SAMBA-007ACC?style=for-the-badge" alt="Järgmine"></a>
+</p>
 
 ---
 
