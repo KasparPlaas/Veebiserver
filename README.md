@@ -2,6 +2,11 @@
 
 Lühike ja praktiline juhend. Allpool kiire liikumine teemade vahel.
 
+## Alustamine
+- [Debian alustamine](00-debian-alustamine.md) – hostname, staatiline IP, SSH
+- [AlmaLinux alustamine](00-almalinux-alustamine.md) – hostname, staatiline IP, SSH
+- [Ubuntu alustamine](00-ubuntu-alustamine.md) – hostname, staatiline IP, SSH
+
 ## Teemad
 - [01 Debian staatiline IP](01-debian-staatiline-ip.md)
 - [02 Debian uuendus 12→13](02-debian-uuendus.md)
