@@ -25,11 +25,21 @@
 # Uuenda süsteemi
 sudo apt update && sudo apt upgrade -y
 
-# Paigalda vajalikud paketid
-sudo apt install curl apt-transport-https gnupg2 -y
+# Paigalda vajalikud paketid (OLULINE!)
+sudo apt install curl apt-transport-https gnupg2 software-properties-common lsb-release -y
+
+# Kui eelmine käsk annab vea, proovi:
+sudo apt --fix-broken install -y
+sudo apt update
+sudo apt install software-properties-common -y
 
 # Kontrolli hostname (peab olema seadistatud!)
 hostnamectl
+
+# Ava vajalikud pordid (UFW puhul)
+sudo ufw allow 1514/tcp
+sudo ufw allow 1515/tcp
+sudo ufw allow 443/tcp
 ```
 
 ---
